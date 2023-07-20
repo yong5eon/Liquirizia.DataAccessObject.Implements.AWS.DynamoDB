@@ -33,7 +33,7 @@ setup(
 		'Application Framework :: Liquirizia :: DataAccessObject :: AWS :: DynamoDB',
 	],
 	install_requires=[
-		'Liquirizia@git+https://github.com/team-of-mine-labs/Liquirizia.git',
+		'Liquirizia@git+https://github.com/yong5eon/Liquirizia.git',
 		'boto3>=1.18.12',
 	],
 	python_requires='>=3.8'
