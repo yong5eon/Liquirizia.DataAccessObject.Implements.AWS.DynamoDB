@@ -5,11 +5,11 @@ from datetime import datetime, date
 from decimal import Decimal
 
 __all__ = (
-	'DataAccessObjectFormatReader'
+	'Decoder'
 )
 
 
-class DataAccessObjectFormatReader(object):
+class Decoder(object):
 	def __call__(self, o):
 		if isinstance(o, str):
 			try:

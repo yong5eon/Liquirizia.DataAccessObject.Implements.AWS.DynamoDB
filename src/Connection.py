@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 
-from Liquirizia.DataAccessObject import DataAccessObject as DataAccessObjectBase
+from Liquirizia.DataAccessObject import Connection as BaseConnection
 from Liquirizia.DataAccessObject.Properties.Document import Document
 
-from .DataAccessObjectConfiguration import DataAccessObjectConfiguration
-from .DataAccessObjectFormatReader import DataAccessObjectFormatReader
-from .DataAccessObjectFormatWriter import DataAccessObjectFormatWriter
+from .Configuration import Configuration
+from .Decoder import Encoder
+from .Encoder import Decoder
 
 from Liquirizia.Util.Dictionary import Replace
 
@@ -14,14 +14,13 @@ from time import sleep
 import boto3
 
 __all__ = (
-	'DataAccessObject'
+	'Connection'
 )
 
 
-class DataAccessObject(DataAccessObjectBase, Document):
+class Connection(BaseConnection, Document):
+	"""Connection Class for DynamoDB of AWS"""
 	"""
-	Data Access Object Class for DynamoDB of AWS
-
 	TODO :
 		* Exception Handling with DataAccessObjectError
 	"""
@@ -35,12 +34,12 @@ class DataAccessObject(DataAccessObjectBase, Document):
 	KeyTypeHash = 'HASH'
 	KeyTypeRange = 'RANGE'
 
-	def __init__(self, conf: DataAccessObjectConfiguration, reader=DataAccessObjectFormatReader(), writer=DataAccessObjectFormatWriter()):
+	def __init__(self, conf: Configuration, decoder=Decoder(), encoder=Encoder()):
 		self.conf = conf
-		self.reader = reader
-		self.writer = writer
+		self.encoder = encoder
+		self.decoder = decoder
 
-		if not isinstance(conf, DataAccessObjectConfiguration):
+		if not isinstance(conf, Configuration):
 			raise RuntimeError('{} is not DataAccessConfiguration for DynamoDB')
 
 		self.client = None
@@ -186,7 +185,7 @@ class DataAccessObject(DataAccessObjectBase, Document):
 		# }
 		#
 
-		kwargs['Item'] = Replace(kwargs['Item'], self.writer)
+		kwargs['Item'] = Replace(kwargs['Item'], self.encoder)
 
 		table = self.client.Table(doc)
 		response = table.put_item(**kwargs)
@@ -221,7 +220,7 @@ class DataAccessObject(DataAccessObjectBase, Document):
 		if 'Item' not in response or not response['Item']:
 			return None
 
-		return Replace(response['Item'], self.reader)
+		return Replace(response['Item'], self.decoder)
 
 	def count(self, doc, **kwargs):
 		table = self.client.Table(doc)
@@ -278,7 +277,7 @@ class DataAccessObject(DataAccessObjectBase, Document):
 		#
 		
 		if kwargs.get('ExclusiveStartKey', None) is not None:
-			kwargs['ExclusiveStartKey'] = Replace(kwargs['ExclusiveStartKey'], self.reader)
+			kwargs['ExclusiveStartKey'] = Replace(kwargs['ExclusiveStartKey'], self.decoder)
 		
 		table = self.client.Table(doc)
 		response = table.query(**kwargs)
@@ -287,9 +286,9 @@ class DataAccessObject(DataAccessObjectBase, Document):
 		if 'Items' not in response or not response['Items']:
 			return result
 		elif isinstance(response['Items'], list):
-			result = [Replace(item, self.reader) for item in response['Items']]
+			result = [Replace(item, self.decoder) for item in response['Items']]
 		else:
-			result = Replace(response['Item'], self.reader)
+			result = Replace(response['Item'], self.decoder)
 		
 		return result
 

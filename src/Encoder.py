@@ -4,11 +4,11 @@ from datetime import datetime, date
 from decimal import Decimal
 
 __all__ = (
-	'DataAccessObjectFormatWriter'
+	'Encoder'
 )
 
 
-class DataAccessObjectFormatWriter(object):
+class Encoder(object):
 	def __call__(self, o):
 		if isinstance(o, float):
 			# TODO : 부동소수점 문제 해결
