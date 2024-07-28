@@ -1,16 +1,18 @@
 # -*- coding: utf-8 -*-
 
-from Liquirizia.DataAccessObject import DataAccessObjectHelper
-
-from Liquirizia.DataAccessObject.Implements.AWS.DynamoDB import DataAccessObject, DataAccessObjectConfiguration
+from Liquirizia.DataAccessObject import Helper
+from Liquirizia.DataAccessObject.Implements.AWS.DynamoDB import (
+	Configuration,
+	Connection,
+)
 
 if __name__ == '__main__':
 
 	# Set connection
-	DataAccessObjectHelper.Set(
+	Helper.Set(
 		'Sample',
-		DataAccessObject,
-		DataAccessObjectConfiguration(
+		Connection,
+		Configuration(
 			token='YOUR_ACCESS_TOKEN',  # Access Key
 			secret='YOUR_ACCESS_TOKEN_SECRET',  # Access Secret Key
 			region='YOUR_REGION',  # Region
@@ -18,7 +20,7 @@ if __name__ == '__main__':
 	)
 
 	# Get connection
-	con = DataAccessObjectHelper.Get('Sample')
+	con = Helper.Get('Sample')
 
 	# create document table
 	con.create(
